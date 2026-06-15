@@ -113,6 +113,23 @@ func (r *OrderRepo) CreateWithStatus(o *models.Order, status models.OrderStatus)
 	return res.LastInsertId()
 }
 
+func (r *OrderRepo) Delete(id int64) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec("DELETE FROM order_parts WHERE order_id = ?", id); err != nil {
+		return err
+	}
+	if _, err := tx.Exec("DELETE FROM orders WHERE id = ?", id); err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
 func (r *OrderRepo) UpdateStatus(id int64, status models.OrderStatus) error {
 	valid := false
 	for _, s := range models.OrderStatuses {

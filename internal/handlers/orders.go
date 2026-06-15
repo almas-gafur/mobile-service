@@ -130,6 +130,23 @@ func (app *App) OrderUpdateStatus(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/orders/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
 }
 
+func (app *App) OrderDelete(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	orderID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "Неверный ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := app.Orders.Delete(orderID); err != nil {
+		app.flash(r, "Ошибка при удалении заказа")
+	} else {
+		app.flash(r, "Заказ успешно удален")
+	}
+
+	http.Redirect(w, r, "/orders", http.StatusSeeOther)
+}
+
 func (app *App) OrderWriteOffPart(w http.ResponseWriter, r *http.Request) {
 	orderID, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
 	if err != nil {
