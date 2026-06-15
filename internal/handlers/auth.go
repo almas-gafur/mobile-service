@@ -8,7 +8,7 @@ import (
 
 func (app *App) LoginPage(w http.ResponseWriter, r *http.Request) {
 	if app.Sessions.GetInt64(r.Context(), "userID") != 0 {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/orders", http.StatusSeeOther)
 		return
 	}
 	app.render(w, r, "login.html", nil)
@@ -35,7 +35,7 @@ func (app *App) LoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	app.Sessions.Put(r.Context(), "userID", user.ID)
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/orders", http.StatusSeeOther)
 }
 
 func (app *App) Logout(w http.ResponseWriter, r *http.Request) {

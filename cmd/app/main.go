@@ -49,6 +49,12 @@ func main() {
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir("./ui/static"))))
 
 	// Public routes
+	r.Get("/", app.LandingPage)
+	r.Post("/request", app.SubmitRequest)
+	r.Get("/request/success", app.RequestSuccess)
+	r.Get("/track", app.TrackStatus)
+	r.Post("/track", app.TrackStatusPost)
+
 	r.Get("/login", app.LoginPage)
 	r.Post("/login", app.LoginPost)
 
@@ -58,7 +64,7 @@ func main() {
 
 		r.Post("/logout", app.Logout)
 
-		r.Get("/", app.OrdersList)
+		r.Get("/orders", app.OrdersList)
 		r.Get("/orders/new", app.OrderNewPage)
 		r.Post("/orders/new", app.OrderCreate)
 		r.Get("/orders/{id}", app.OrderDetail)

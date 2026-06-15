@@ -1,0 +1,87 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{block "title" .}}Сервисный центр RepairCRM{{end}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50:'#eff6ff', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-header {
+            background: rgba(3, 7, 18, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="dark bg-gray-950 text-gray-100 font-sans antialiased flex flex-col min-h-screen">
+
+<!-- Header -->
+<header class="fixed top-0 w-full z-50 glass-header transition-all duration-300">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-2.5 group">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-blue-600/30 group-hover:scale-105 transition-transform">R</div>
+            <span class="font-bold text-lg tracking-tight text-white">Repair<span class="text-blue-500">Center</span></span>
+        </a>
+        
+        <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+            <a href="/#services" class="text-gray-400 hover:text-white transition-colors">Услуги</a>
+            <a href="/#advantages" class="text-gray-400 hover:text-white transition-colors">Преимущества</a>
+            <a href="/track" class="text-gray-400 hover:text-white transition-colors">Статус ремонта</a>
+        </nav>
+        
+        <div class="flex items-center gap-4">
+            <a href="/track" class="md:hidden text-sm font-medium text-gray-400 hover:text-white">Статус</a>
+            <a href="/login" class="text-sm font-medium text-gray-500 hover:text-gray-300 transition-colors">Для сотрудников</a>
+        </div>
+    </div>
+</header>
+
+<!-- Main content -->
+<main class="flex-1 pt-16 relative">
+    <!-- Ambient background glows -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-blue-600/20 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+    <div class="absolute top-40 right-0 w-[400px] h-[400px] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+
+    {{if .Flash}}
+    <div class="max-w-6xl mx-auto px-4 mt-6">
+        <div id="flash" class="flash-banner rounded-xl border border-emerald-500/20 shadow-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{.Flash}}
+        </div>
+    </div>
+    {{end}}
+
+    {{block "content" .}}{{end}}
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-gray-800/60 bg-gray-950 mt-20">
+    <div class="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+            <div class="w-6 h-6 bg-gray-800 rounded flex items-center justify-center text-gray-400 font-bold text-xs">R</div>
+            <span class="text-sm font-medium text-gray-400">RepairCenter © 2026</span>
+        </div>
+        <p class="text-sm text-gray-500">Профессиональный ремонт мобильной техники</p>
+    </div>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>{{end}}

@@ -1,0 +1,94 @@
+{{define "title"}}Статус ремонта — RepairCRM{{end}}
+
+{{define "content"}}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-white mb-3">Отследить статус ремонта</h1>
+        <p class="text-gray-400">Введите номер вашей заявки и телефон, чтобы узнать на каком этапе находится ваше устройство.</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6 md:p-8 shadow-xl mb-10">
+        {{if .Data}}{{with .Data}}
+        {{if .Error}}
+        <div class="bg-red-900/30 border border-red-700/50 text-red-300 rounded-lg px-4 py-3 mb-6 text-sm flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {{.Error}}
+        </div>
+        {{end}}
+        {{end}}{{end}}
+
+        <form action="/track" method="POST" class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="flex-1 w-full">
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Номер заявки</label>
+                <input type="text" name="order_id" required class="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="Например: 42">
+            </div>
+            <div class="flex-1 w-full">
+                <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Номер телефона</label>
+                <input type="tel" name="phone" required class="w-full bg-gray-950 border border-gray-800 rounded-lg px-4 py-2.5 text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" placeholder="+7 (___) ___-__-__">
+            </div>
+            <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors h-[46px] shrink-0">
+                Найти
+            </button>
+        </form>
+    </div>
+
+    <!-- Results (If order found) -->
+    {{if .Data}}{{with .Data}}
+    {{if .Order}}
+    <div class="relative bg-gray-900 border border-gray-800 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden">
+        <!-- Glow effect based on status -->
+        {{if eq .Order.Status "ready"}}
+        <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+        {{else if eq .Order.Status "in_progress"}}
+        <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+        {{else if eq .Order.Status "new"}}
+        <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+        {{else}}
+        <div class="absolute top-0 right-0 w-64 h-64 bg-gray-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+        {{end}}
+
+        <div class="flex flex-col md:flex-row md:items-start justify-between gap-6 relative z-10">
+            <div>
+                <div class="text-sm text-gray-500 font-medium mb-1">Устройство</div>
+                <h2 class="text-xl md:text-2xl font-bold text-white mb-2">{{.Order.Device}}</h2>
+                <div class="text-sm text-gray-400">Владелец: {{.Order.ClientName}}</div>
+            </div>
+            <div class="text-left md:text-right">
+                <div class="text-sm text-gray-500 font-medium mb-1">Статус</div>
+                <div class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold tracking-wide
+                    {{if eq .Order.Status "ready"}}bg-emerald-500/20 text-emerald-400
+                    {{else if eq .Order.Status "in_progress"}}bg-blue-500/20 text-blue-400
+                    {{else if eq .Order.Status "new"}}bg-purple-500/20 text-purple-400
+                    {{else if eq .Order.Status "waiting_parts"}}bg-orange-500/20 text-orange-400
+                    {{else if eq .Order.Status "diagnosis"}}bg-yellow-500/20 text-yellow-400
+                    {{else}}bg-gray-800 text-gray-300{{end}}">
+                    {{.StatusLabel}}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-gray-800/60">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div>
+                    <div class="text-xs text-gray-500 font-medium mb-1">Номер заявки</div>
+                    <div class="text-white font-medium">#{{.Order.ID}}</div>
+                </div>
+                <div>
+                    <div class="text-xs text-gray-500 font-medium mb-1">Дата создания</div>
+                    <div class="text-white font-medium">{{.Order.CreatedAt.Format "02.01.2006"}}</div>
+                </div>
+                {{if gt .Order.EstimatedCost 0.0}}
+                <div class="col-span-2 md:col-span-1">
+                    <div class="text-xs text-gray-500 font-medium mb-1">Ориентировочная стоимость</div>
+                    <div class="text-white font-medium">{{printf "%.0f" .Order.EstimatedCost}} ₸</div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+    {{end}}
+    {{end}}{{end}}
+
+</div>
+{{end}}

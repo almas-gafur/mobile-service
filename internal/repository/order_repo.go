@@ -99,9 +99,13 @@ func (r *OrderRepo) getOrderParts(orderID int64) ([]models.OrderPart, error) {
 }
 
 func (r *OrderRepo) Create(o *models.Order) (int64, error) {
+	return r.CreateWithStatus(o, models.StatusAccepted)
+}
+
+func (r *OrderRepo) CreateWithStatus(o *models.Order, status models.OrderStatus) (int64, error) {
 	res, err := r.db.Exec(
 		"INSERT INTO orders (client_name, phone, device, description, estimated_cost, status) VALUES (?, ?, ?, ?, ?, ?)",
-		o.ClientName, o.Phone, o.Device, o.Description, o.EstimatedCost, models.StatusAccepted,
+		o.ClientName, o.Phone, o.Device, o.Description, o.EstimatedCost, status,
 	)
 	if err != nil {
 		return 0, err

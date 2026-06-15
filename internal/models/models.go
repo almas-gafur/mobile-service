@@ -20,6 +20,7 @@ type User struct {
 type OrderStatus string
 
 const (
+	StatusNew        OrderStatus = "new"
 	StatusAccepted   OrderStatus = "accepted"
 	StatusDiagnosis  OrderStatus = "diagnosis"
 	StatusWaiting    OrderStatus = "waiting_parts"
@@ -30,6 +31,7 @@ const (
 
 func (s OrderStatus) Label() string {
 	labels := map[OrderStatus]string{
+		StatusNew:        "Новая заявка",
 		StatusAccepted:   "Принят",
 		StatusDiagnosis:  "В диагностике",
 		StatusWaiting:    "Ожидает запчастей",
@@ -44,6 +46,7 @@ func (s OrderStatus) Label() string {
 }
 
 var OrderStatuses = []OrderStatus{
+	StatusNew,
 	StatusAccepted,
 	StatusDiagnosis,
 	StatusWaiting,

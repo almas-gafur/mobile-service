@@ -61,11 +61,26 @@ func (app *App) loadTemplates() {
 		"part_edit.html",
 	}
 
-	app.tmpls = make(map[string]*template.Template, len(pages))
+	app.tmpls = make(map[string]*template.Template)
 	base := filepath.Join(root, "base.html")
 
 	for _, page := range pages {
 		t, err := template.New("").Funcs(funcMap).ParseFiles(base, filepath.Join(root, page))
+		if err != nil {
+			log.Fatalf("parse template %s: %v", page, err)
+		}
+		app.tmpls[page] = t
+	}
+
+	publicPages := []string{
+		"landing.html",
+		"track.html",
+		"request_success.html",
+	}
+	publicBase := filepath.Join(root, "public_base.html")
+
+	for _, page := range publicPages {
+		t, err := template.New("").Funcs(funcMap).ParseFiles(publicBase, filepath.Join(root, page))
 		if err != nil {
 			log.Fatalf("parse template %s: %v", page, err)
 		}
@@ -99,8 +114,8 @@ func (app *App) render(w http.ResponseWriter, r *http.Request, name string, data
 		http.Error(w, fmt.Sprintf("шаблон %s не найден", name), http.StatusInternalServerError)
 		return
 	}
-	// ParseFiles names templates by their base filename; execute base.html which calls others
-	if err := t.ExecuteTemplate(w, "base.html", td); err != nil {
+	// Execute "layout" which will be defined in base.html and public_base.html
+	if err := t.ExecuteTemplate(w, "layout", td); err != nil {
 		log.Printf("render %s: %v", name, err)
 		http.Error(w, "Ошибка рендеринга", http.StatusInternalServerError)
 	}
