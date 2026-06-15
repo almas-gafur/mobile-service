@@ -1,0 +1,153 @@
+
+{{define "title"}}Заказ #{{.Data.Order.ID}} — RepairCRM{{end}}
+
+{{define "content"}}
+{{with .Data}}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6 flex items-start justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <a href="/" class="text-gray-500 hover:text-gray-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold text-white">Заказ #{{.Order.ID}}</h1>
+                    <span class="status-badge status-{{.Order.Status}}">{{statusLabel .Order.Status}}</span>
+                </div>
+                <p class="text-gray-500 text-sm mt-0.5">Создан {{.Order.CreatedAt.Format "02.01.2006 в 15:04"}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+        <!-- Left column: details -->
+        <div class="col-span-2 space-y-5">
+            <!-- Client info -->
+            <div class="card p-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Информация о клиенте</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Имя клиента</div>
+                        <div class="font-medium text-white">{{.Order.ClientName}}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Телефон</div>
+                        <div class="font-medium text-white">{{.Order.Phone}}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Устройство</div>
+                        <div class="font-medium text-white">{{.Order.Device}}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">Предварительная стоимость</div>
+                        <div class="font-medium text-green-400">{{printf "%.0f ₸" .Order.EstimatedCost}}</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="text-xs text-gray-500 mb-1">Описание неисправности</div>
+                        <div class="text-gray-300">{{if .Order.Description}}{{.Order.Description}}{{else}}<span class="text-gray-600">—</span>{{end}}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parts used -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide">Использованные запчасти</h2>
+                    <button onclick="document.getElementById('writeoff-modal').classList.remove('hidden')"
+                        class="btn-secondary text-xs py-1.5 px-3">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Списать запчасть
+                    </button>
+                </div>
+
+                {{if .Order.Parts}}
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-800 text-gray-500 text-xs uppercase">
+                            <th class="pb-2 text-left font-medium">Запчасть</th>
+                            <th class="pb-2 text-left font-medium">Количество</th>
+                            <th class="pb-2 text-left font-medium">Дата списания</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800/60">
+                        {{range .Order.Parts}}
+                        <tr>
+                            <td class="py-2.5 text-gray-200">{{.PartName}}</td>
+                            <td class="py-2.5 text-gray-400">{{.Quantity}} шт.</td>
+                            <td class="py-2.5 text-gray-500 text-xs">{{.CreatedAt.Format "02.01.2006 15:04"}}</td>
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+                {{else}}
+                <div class="py-8 text-center text-gray-600 text-sm">Запчасти ещё не списывались</div>
+                {{end}}
+            </div>
+        </div>
+
+        <!-- Right column: status -->
+        <div class="space-y-5">
+            <div class="card p-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-4">Статус заказа</h2>
+                <form method="POST" action="/orders/{{.Order.ID}}/status" class="space-y-3" id="status-form">
+                    {{$currentStatus := .Order.Status}}
+                    {{range .AllStatuses}}
+                    <label class="status-radio-label {{if eq $currentStatus (printf "%s" .Value)}}selected{{end}}">
+                        <input type="radio" name="status" value="{{.Value}}" class="sr-only"
+                            {{if eq $currentStatus (printf "%s" .Value)}}checked{{end}}
+                            onchange="document.getElementById('status-form').submit()">
+                        <span class="status-dot status-dot-{{.Value}}"></span>
+                        {{.Label}}
+                    </label>
+                    {{end}}
+                </form>
+            </div>
+
+            <div class="card p-6">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-3">Обновлён</h2>
+                <div class="text-gray-300 text-sm">{{.Order.UpdatedAt.Format "02.01.2006"}}</div>
+                <div class="text-gray-500 text-xs">{{.Order.UpdatedAt.Format "15:04"}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Write-off modal -->
+<div id="writeoff-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-backdrop" onclick="document.getElementById('writeoff-modal').classList.add('hidden')"></div>
+    <div class="modal-box w-full max-w-md relative z-10">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-semibold text-white">Списать запчасть</h3>
+            <button onclick="document.getElementById('writeoff-modal').classList.add('hidden')"
+                class="text-gray-500 hover:text-gray-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form method="POST" action="/orders/{{.Order.ID}}/parts" class="space-y-4">
+            <div>
+                <label class="form-label">Запчасть</label>
+                <select name="part_id" id="part_select" class="form-input" required>
+                    <option value="">— выберите запчасть —</option>
+                    {{range .Parts}}
+                    <option value="{{.ID}}" data-qty="{{.Quantity}}">
+                        {{.Name}} (в наличии: {{.Quantity}} шт.)
+                    </option>
+                    {{end}}
+                </select>
+                <p id="stock-info" class="text-xs text-gray-500 mt-1 hidden">Доступно: <span id="stock-qty"></span> шт.</p>
+            </div>
+            <div>
+                <label class="form-label">Количество</label>
+                <input type="number" name="quantity" id="writeoff-qty" min="1" value="1" required class="form-input">
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="submit" class="btn-primary flex-1">Списать</button>
+                <button type="button" onclick="document.getElementById('writeoff-modal').classList.add('hidden')"
+                    class="btn-ghost flex-1">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+{{end}}
+{{end}}

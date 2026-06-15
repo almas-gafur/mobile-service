@@ -1,0 +1,90 @@
+
+{{define "title"}}Заказы — RepairCRM{{end}}
+
+{{define "content"}}
+{{with .Data}}
+<div class="mb-8 flex items-start justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white">Заказы на ремонт</h1>
+        <p class="text-gray-500 text-sm mt-1">Всего: {{index .StatusCounts "total"}} заказов</p>
+    </div>
+    <a href="/orders/new" class="btn-primary shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Новый заказ
+    </a>
+</div>
+
+<!-- Status filter tabs -->
+<div class="flex items-center gap-2 mb-5 flex-wrap">
+    {{$sf := .StatusFilter}}{{$sc := .StatusCounts}}
+    <a href="/" class="status-tab {{if eq $sf ""}}active{{end}}">
+        Все <span class="count-badge">{{index $sc "total"}}</span>
+    </a>
+    {{range .AllStatuses}}
+    <a href="/?status={{.Value}}" class="status-tab {{if eq $sf .Value}}active{{end}}">
+        {{.Label}}
+        {{$cnt := index $sc .Value}}
+        {{if $cnt}}<span class="count-badge">{{$cnt}}</span>{{end}}
+    </a>
+    {{end}}
+</div>
+
+<!-- Search -->
+<form method="GET" action="/" class="mb-6">
+    {{if .StatusFilter}}<input type="hidden" name="status" value="{{.StatusFilter}}">{{end}}
+    <div class="relative max-w-sm">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input type="text" name="search" value="{{.Search}}" id="search-input"
+            class="form-input pl-9 pr-4" placeholder="Поиск по клиенту или телефону…">
+    </div>
+</form>
+
+<!-- Orders table -->
+<div class="card overflow-hidden">
+    {{if .Orders}}
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm" id="orders-table">
+            <thead>
+                <tr class="border-b border-gray-800 text-gray-500 text-xs uppercase tracking-wide">
+                    <th class="px-5 py-3 text-left font-medium">#</th>
+                    <th class="px-5 py-3 text-left font-medium">Клиент</th>
+                    <th class="px-5 py-3 text-left font-medium">Телефон</th>
+                    <th class="px-5 py-3 text-left font-medium">Устройство</th>
+                    <th class="px-5 py-3 text-left font-medium">Статус</th>
+                    <th class="px-5 py-3 text-left font-medium">Стоимость</th>
+                    <th class="px-5 py-3 text-left font-medium">Дата</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800/60">
+                {{range .Orders}}
+                <tr class="hover:bg-gray-800/40 transition-colors group">
+                    <td class="px-5 py-3.5 text-gray-500">{{.ID}}</td>
+                    <td class="px-5 py-3.5 font-medium text-white">{{.ClientName}}</td>
+                    <td class="px-5 py-3.5 text-gray-400">{{.Phone}}</td>
+                    <td class="px-5 py-3.5 text-gray-300">{{.Device}}</td>
+                    <td class="px-5 py-3.5">
+                        <span class="status-badge status-{{.Status}}">{{statusLabel .Status}}</span>
+                    </td>
+                    <td class="px-5 py-3.5 text-gray-300">{{printf "%.0f ₸" .EstimatedCost}}</td>
+                    <td class="px-5 py-3.5 text-gray-500 text-xs">{{.CreatedAt.Format "02.01.2006"}}</td>
+                    <td class="px-5 py-3.5">
+                        <a href="/orders/{{.ID}}" class="text-blue-400 hover:text-blue-300 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            Открыть →
+                        </a>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{else}}
+    <div class="py-20 text-center">
+        <div class="text-5xl mb-3">📋</div>
+        <p class="text-gray-500 text-sm">Заказы не найдены</p>
+        <a href="/orders/new" class="btn-primary inline-flex mt-4">Создать первый заказ</a>
+    </div>
+    {{end}}
+</div>
+{{end}}
+{{end}}

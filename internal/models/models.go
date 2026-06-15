@@ -2,104 +2,82 @@ package models
 
 import "time"
 
+type Role string
+
 const (
-	StatusDraft      = "Заявка"
-	StatusAccepted   = "Принято"
-	StatusInProgress = "В работе"
-	StatusDone       = "Готово"
-	StatusIssued     = "Выдано"
+	RoleAdmin  Role = "admin"
+	RoleMaster Role = "master"
 )
 
-var ticketStatuses = map[string]struct{}{
-	StatusDraft:      {},
-	StatusAccepted:   {},
-	StatusInProgress: {},
-	StatusDone:       {},
-	StatusIssued:     {},
+type User struct {
+	ID        int64
+	Username  string
+	Password  string
+	Role      Role
+	CreatedAt time.Time
 }
 
-func TicketStatuses() []string {
-	return []string{StatusDraft, StatusAccepted, StatusInProgress, StatusDone, StatusIssued}
+type OrderStatus string
+
+const (
+	StatusAccepted   OrderStatus = "accepted"
+	StatusDiagnosis  OrderStatus = "diagnosis"
+	StatusWaiting    OrderStatus = "waiting_parts"
+	StatusInProgress OrderStatus = "in_progress"
+	StatusReady      OrderStatus = "ready"
+	StatusIssued     OrderStatus = "issued"
+)
+
+func (s OrderStatus) Label() string {
+	labels := map[OrderStatus]string{
+		StatusAccepted:   "Принят",
+		StatusDiagnosis:  "В диагностике",
+		StatusWaiting:    "Ожидает запчастей",
+		StatusInProgress: "В работе",
+		StatusReady:      "Готов",
+		StatusIssued:     "Выдан",
+	}
+	if l, ok := labels[s]; ok {
+		return l
+	}
+	return string(s)
 }
 
-func IsValidTicketStatus(status string) bool {
-	_, ok := ticketStatuses[status]
-	return ok
+var OrderStatuses = []OrderStatus{
+	StatusAccepted,
+	StatusDiagnosis,
+	StatusWaiting,
+	StatusInProgress,
+	StatusReady,
+	StatusIssued,
 }
 
-type Workshop struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
+type Order struct {
+	ID            int64
+	ClientName    string
+	Phone         string
+	Device        string
+	Description   string
+	EstimatedCost float64
+	Status        OrderStatus
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Parts         []OrderPart
 }
 
-type Master struct {
-	ID           int64  `json:"id"`
-	WorkshopID   int64  `json:"workshop_id"`
-	WorkshopName string `json:"workshop_name,omitempty"`
-	Username     string `json:"username"`
-	PasswordHash string `json:"-"`
+type Part struct {
+	ID            int64
+	Name          string
+	Quantity      int
+	PurchasePrice float64
+	CreatedAt     time.Time
 }
 
-type Device struct {
-	ID    int64  `json:"id"`
-	IMEI  string `json:"imei"`
-	Brand string `json:"brand"`
-	Model string `json:"model"`
-}
-
-type RepairTicket struct {
-	ID                int64     `json:"id"`
-	ShortHash         string    `json:"short_hash,omitempty"`
-	WorkshopID        int64     `json:"workshop_id"`
-	DeviceID          int64     `json:"device_id"`
-	ClientName        string    `json:"client_name"`
-	ClientPhone       string    `json:"client_phone"`
-	Status            string    `json:"status"`
-	DefectDescription string    `json:"defect_description"`
-	WaterDamage       bool      `json:"water_damage"`
-	WarrantyDays      int       `json:"warranty_days"`
-	Price             int       `json:"price"`
-	Rating            *int      `json:"rating,omitempty"`
-	ReviewText        string    `json:"review_text,omitempty"`
-	CreatedAt         time.Time `json:"created_at"`
-	Device            Device    `json:"device"`
-}
-
-type PublicApplicationInput struct {
-	ClientName        string `json:"client_name"`
-	ClientPhone       string `json:"client_phone"`
-	Brand             string `json:"brand"`
-	Model             string `json:"model"`
-	DefectDescription string `json:"defect_description"`
-}
-
-type CreateTicketInput struct {
-	ClientName        string `json:"client_name"`
-	ClientPhone       string `json:"client_phone"`
-	IMEI              string `json:"imei"`
-	Brand             string `json:"brand"`
-	Model             string `json:"model"`
-	DefectDescription string `json:"defect_description"`
-	WaterDamage       bool   `json:"water_damage"`
-	WarrantyDays      int    `json:"warranty_days"`
-	Price             int    `json:"price"`
-}
-
-type UpdateTicketInput struct {
-	ClientName        string `json:"client_name"`
-	ClientPhone       string `json:"client_phone"`
-	IMEI              string `json:"imei"`
-	Brand             string `json:"brand"`
-	Model             string `json:"model"`
-	Status            string `json:"status"`
-	DefectDescription string `json:"defect_description"`
-	WaterDamage       bool   `json:"water_damage"`
-	WarrantyDays      int    `json:"warranty_days"`
-	Price             int    `json:"price"`
-}
-
-type ReviewInput struct {
-	Rating     int    `json:"rating"`
-	ReviewText string `json:"review_text"`
+type OrderPart struct {
+	ID        int64
+	OrderID   int64
+	PartID    int64
+	PartName  string
+	Quantity  int
+	CreatedAt time.Time
 }

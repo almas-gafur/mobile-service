@@ -1,4 +1,0 @@
-DROP TABLE IF EXISTS repair_tickets;
-DROP TABLE IF EXISTS devices;
-DROP TABLE IF EXISTS masters;
-DROP TABLE IF EXISTS workshops;
