@@ -65,7 +65,6 @@ func (app *App) TrackStatus(w http.ResponseWriter, r *http.Request) {
 // TrackStatusPost handles the status lookup.
 func (app *App) TrackStatusPost(w http.ResponseWriter, r *http.Request) {
 	orderIDStr := r.FormValue("order_id")
-	phone := r.FormValue("phone")
 
 	orderID, err := strconv.ParseInt(orderIDStr, 10, 64)
 	if err != nil {
@@ -81,9 +80,9 @@ func (app *App) TrackStatusPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if order == nil || order.Phone != phone {
+	if order == nil {
 		app.render(w, r, "track.html", map[string]interface{}{
-			"Error": "Заказ не найден или номер телефона не совпадает",
+			"Error": "Заказ не найден",
 		})
 		return
 	}
