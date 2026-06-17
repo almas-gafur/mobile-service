@@ -20,6 +20,12 @@
                     <form method="POST" action="/orders/{{.Order.ID}}/delete" onsubmit="return confirm('Вы уверены, что хотите удалить этот заказ? Действие необратимо.');">
                         <button type="submit" class="text-red-500 hover:text-red-400 text-sm font-medium transition-colors">Удалить заказ</button>
                     </form>
+                    {{if and $.CurrentUser (eq (printf "%s" $.CurrentUser.Role) "admin")}}
+                    <button onclick="document.getElementById('reject-modal').classList.remove('hidden')"
+                        class="ml-2 text-yellow-400 hover:text-yellow-300 text-sm font-medium transition-colors">
+                        Отклонить / отправить сообщение
+                    </button>
+                    {{end}}
                 </div>
             </div>
         </div>
@@ -107,6 +113,12 @@
                     </label>
                     {{end}}
                 </form>
+
+                <!-- Admin actions: reject with feedback -->
+                <div class="mt-4">
+                    <button onclick="document.getElementById('reject-modal').classList.remove('hidden')"
+                        class="btn-ghost w-full text-sm">Отклонить / Написать сообщение клиенту</button>
+                </div>
             </div>
 
             <div class="card p-6">
@@ -154,5 +166,56 @@
         </form>
     </div>
 </div>
+<!-- Reject modal (admin) -->
+<div id="reject-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-backdrop" onclick="document.getElementById('reject-modal').classList.add('hidden')"></div>
+    <div class="modal-box w-full max-w-md relative z-10">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-semibold text-white">Отклонить заказ и отправить сообщение клиенту</h3>
+            <button onclick="document.getElementById('reject-modal').classList.add('hidden')"
+                class="text-gray-500 hover:text-gray-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form method="POST" action="/orders/{{.Order.ID}}/reject" class="space-y-4">
+            <div>
+                <label class="form-label">Короткое сообщение для клиента</label>
+                <textarea name="message" rows="4" maxlength="500" required class="form-input"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Коротко опишите причину или попросите дополнительные данные.</p>
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="submit" class="btn-primary flex-1">Отправить и отклонить</button>
+                <button type="button" onclick="document.getElementById('reject-modal').classList.add('hidden')"
+                    class="btn-ghost flex-1">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Reject modal -->
+<div id="reject-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-backdrop" onclick="document.getElementById('reject-modal').classList.add('hidden')"></div>
+    <div class="modal-box w-full max-w-lg relative z-10">
+        <div class="flex items-center justify-between mb-5">
+            <h3 class="text-lg font-semibold text-white">Отклонить заказ и отправить сообщение</h3>
+            <button onclick="document.getElementById('reject-modal').classList.add('hidden')"
+                class="text-gray-500 hover:text-gray-300 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form method="POST" action="/orders/{{.Order.ID}}/reject" class="space-y-4">
+            <div>
+                <label class="form-label">Сообщение клиенту (коротко)</label>
+                <textarea name="message" rows="4" maxlength="500" required class="form-input w-full" placeholder="Коротко объясните причину отказа или укажите, что нужно уточнить"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Сообщение будет сохранено в истории заказа и доступно клиенту.</p>
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="submit" class="btn-danger flex-1">Отклонить и отправить</button>
+                <button type="button" onclick="document.getElementById('reject-modal').classList.add('hidden')" class="btn-ghost flex-1">Отмена</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 {{end}}
 {{end}}
