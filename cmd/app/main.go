@@ -10,9 +10,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 
-	"repair-crm/internal/config"
-	"repair-crm/internal/database"
-	"repair-crm/internal/handlers"
+	"mobile-service/internal/config"
+	"mobile-service/internal/database"
+	"mobile-service/internal/handlers"
 )
 
 func main() {

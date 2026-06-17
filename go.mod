@@ -1,4 +1,4 @@
-module repair-crm
+module mobile-service
 
 go 1.22
 

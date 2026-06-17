@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"repair-crm/internal/models"
+	"mobile-service/internal/models"
 )
 
 type PartRepo struct {
