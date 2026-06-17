@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"mobile-service/internal/"
+	"mobile-service/internal/models"
 )
 
 func (app *App) PartsList(w http.ResponseWriter, r *http.Request) {
