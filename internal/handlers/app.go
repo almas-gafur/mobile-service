@@ -10,8 +10,8 @@ import (
 	"runtime"
 
 	"github.com/alexedwards/scs/v2"
-	"repair-crm/internal/models"
-	"repair-crm/internal/repository"
+	"mobile-service/internal/"
+	"mobile-service/internal/"
 )
 
 type App struct {

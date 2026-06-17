@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"repair-crm/internal/models"
+	"mobile-service/internal/"
 )
 
 // LandingPage renders the public home page with the request form.

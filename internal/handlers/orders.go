@@ -5,8 +5,8 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	"repair-crm/internal/models"
-	"repair-crm/internal/repository"
+	"mobile-service/internal/"
+	"mobile-service/internal/"
 )
 
 type ordersPageData struct {

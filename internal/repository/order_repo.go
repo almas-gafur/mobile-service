@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"repair-crm/internal/models"
+	"mobile-service/internal/"
 )
 
 type OrderRepo struct {
