@@ -171,3 +171,39 @@ func (app *App) OrderWriteOffPart(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/orders/"+strconv.FormatInt(orderID, 10), http.StatusSeeOther)
 }
+
+
+func (app *App) OrderReject(w http.ResponseWriter, r *http.Request) {
+id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+if err != nil {
+http.NotFound(w, r)
+return
+}
+
+if err := r.ParseForm(); err != nil {
+app.flash(r, "Ошибка формы")
+http.Redirect(w, r, "/orders/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
+return
+}
+
+msg := r.FormValue("message")
+if msg == "" {
+app.flash(r, "Введите короткое сообщение для клиента")
+http.Redirect(w, r, "/orders/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
+return
+}
+
+adminID := app.Sessions.GetInt64(r.Context(), "userID")
+if adminID == 0 {
+http.Error(w, "unauthorized", http.StatusUnauthorized)
+return
+}
+
+if err := app.Orders.Reject(id, adminID, msg); err != nil {
+app.flash(r, "Ошибка при отклонении: "+err.Error())
+} else {
+app.flash(r, "Заказ отклонён и клиенту отправлено сообщение")
+}
+
+http.Redirect(w, r, "/orders/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
+}
