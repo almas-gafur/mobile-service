@@ -149,6 +149,31 @@ func (r *OrderRepo) UpdateStatus(id int64, status models.OrderStatus) error {
 	return err
 }
 
+
+// Reject marks an order as rejected and stores admin feedback in order_feedback table atomically.
+func (r *OrderRepo) Reject(orderID, adminID int64, message string) error {
+tx, err := r.db.Begin()
+if err != nil {
+return err
+}
+defer tx.Rollback()
+
+// Update order status to rejected
+if _, err := tx.Exec("UPDATE orders SET status = ?, updated_at = ? WHERE id = ?", models.StatusRejected, time.Now(), orderID); err != nil {
+return err
+}
+
+// Insert feedback
+if _, err := tx.Exec(
+"INSERT INTO order_feedback (order_id, admin_id, message, created_at) VALUES (?, ?, ?, ?)",
+orderID, adminID, message, time.Now(),
+); err != nil {
+return err
+}
+
+return tx.Commit()
+}
+
 // StatusCounts returns count per status for the dashboard badge.
 func (r *OrderRepo) StatusCounts() (map[string]int, error) {
 	rows, err := r.db.Query("SELECT status, COUNT(*) FROM orders GROUP BY status")

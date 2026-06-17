@@ -27,6 +27,7 @@ const (
 	StatusInProgress OrderStatus = "in_progress"
 	StatusReady      OrderStatus = "ready"
 	StatusIssued     OrderStatus = "issued"
+	StatusRejected   OrderStatus = "rejected"
 )
 
 func (s OrderStatus) Label() string {
@@ -38,6 +39,7 @@ func (s OrderStatus) Label() string {
 		StatusInProgress: "В работе",
 		StatusReady:      "Готов",
 		StatusIssued:     "Выдан",
+	StatusRejected:   "Отклонён",
 	}
 	if l, ok := labels[s]; ok {
 		return l
@@ -53,6 +55,7 @@ var OrderStatuses = []OrderStatus{
 	StatusInProgress,
 	StatusReady,
 	StatusIssued,
+	StatusRejected,
 }
 
 type Order struct {
