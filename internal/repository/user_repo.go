@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"mobile-service/internal/"
+	"mobile-service/internal/models"
 )
 
 type UserRepo struct {

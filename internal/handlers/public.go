@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"mobile-service/internal/"
+	"mobile-service/internal/models"
 )
 
 // LandingPage renders the public home page with the request form.

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"mobile-service/internal/"
+	"mobile-service/internal/models"
 )
 
 type OrderRepo struct {
