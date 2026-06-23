@@ -38,3 +38,8 @@ go run ./cmd/app
 Учетные данные для сотрудников
 Роль администратора: admin / admin123
 Роль мастера: master / master123 Вход в CRM для сотрудников теперь доступен через кнопку в шапке сайта на лендинге или по прямому адресу http://localhost:8080/login.
+
+git config --global credential.helper store
+git clone https://github.com/almas-gafur/mobile-service.git
+cd mobile-service
+code .
