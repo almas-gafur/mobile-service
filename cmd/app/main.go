@@ -71,6 +71,8 @@ func main() {
 		r.Post("/orders/{id}/status", app.OrderUpdateStatus)
 		r.Post("/orders/{id}/parts", app.OrderWriteOffPart)
 		r.Post("/orders/{id}/delete", app.OrderDelete)
+		r.Get("/orders/{id}/receipt", app.OrderReceipt)
+		r.Get("/orders/{id}/warranty", app.OrderWarranty)
 
 		r.Get("/parts", app.PartsList)
 		r.Get("/parts/new", app.PartNewPage)

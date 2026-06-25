@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гарантийный талон #{{.Order.ID}} — Xmobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1a1a1a;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .document {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px 50px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        /* Header */
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+        }
+        .doc-header-left h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #10b981;
+            margin-bottom: 2px;
+        }
+        .doc-header-left p {
+            font-size: 12px;
+            color: #666;
+        }
+        .doc-header-right {
+            text-align: right;
+        }
+        .doc-header-right .doc-number {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+        .doc-header-right .doc-date {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .doc-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            color: #333;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #10b981;
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        /* Data table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table td {
+            padding: 6px 8px;
+            vertical-align: top;
+        }
+        .data-table .label {
+            width: 40%;
+            font-weight: 500;
+            color: #666;
+            font-size: 12px;
+        }
+        .data-table .value {
+            font-weight: 500;
+            color: #1a1a1a;
+        }
+        .data-table tr + tr .label,
+        .data-table tr + tr .value {
+            border-top: 1px solid #f3f4f6;
+        }
+
+        /* Parts table */
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .parts-table thead th {
+            text-align: left;
+            padding: 8px 10px;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #555;
+        }
+        .parts-table tbody td {
+            padding: 7px 10px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #333;
+        }
+        .parts-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .parts-empty {
+            text-align: center;
+            padding: 16px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        /* Warranty block */
+        .warranty-block {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 14px 18px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .warranty-title {
+            font-weight: 700;
+            font-size: 12px;
+            color: #166534;
+            margin-bottom: 6px;
+        }
+        .warranty-period {
+            font-size: 14px;
+            font-weight: 700;
+            color: #15803d;
+            margin-bottom: 8px;
+        }
+        .warranty-block ul {
+            padding-left: 18px;
+            margin: 6px 0 0;
+        }
+        .warranty-block ul li {
+            margin-bottom: 3px;
+        }
+
+        /* Signatures */
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            gap: 60px;
+            margin-top: 40px;
+            padding-top: 10px;
+        }
+        .sig-block {
+            flex: 1;
+        }
+        .sig-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .sig-role {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .sig-line {
+            border-top: 1px solid #1a1a1a;
+            padding-top: 4px;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Print button */
+        .print-controls {
+            text-align: center;
+            margin: 24px auto 0;
+            max-width: 210mm;
+        }
+        .btn-print {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 28px;
+            background: #10b981;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+        .btn-print:hover {
+            background: #059669;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+                margin: 0;
+            }
+            .document {
+                border: none;
+                box-shadow: none;
+                padding: 10mm 15mm;
+                max-width: none;
+            }
+            .print-controls {
+                display: none !important;
+            }
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="document">
+    <div class="doc-header">
+        <div class="doc-header-left">
+            <h1>Xmobile</h1>
+            <p>Сервисный центр по ремонту мобильной техники</p>
+            <p>Тел: +7 (777) 123-45-67 | г. Алматы, ул. Абая, 1</p>
+        </div>
+        <div class="doc-header-right">
+            <div class="doc-number">Заказ №{{.Order.ID}}</div>
+            <div class="doc-date">Дата выдачи: {{formatDate .Now}}</div>
+        </div>
+    </div>
+
+    <div class="doc-title">Гарантийный талон</div>
+
+    <div class="section">
+        <div class="section-title">Данные устройства</div>
+        <table class="data-table">
+            <tr>
+                <td class="label">Устройство (бренд / модель)</td>
+                <td class="value">{{.Order.Device}}</td>
+            </tr>
+            <tr>
+                <td class="label">Серийный номер / IMEI</td>
+                <td class="value" style="color:#999;">Не указан</td>
+            </tr>
+            <tr>
+                <td class="label">Клиент</td>
+                <td class="value">{{.Order.ClientName}}, {{.Order.Phone}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Детализация выполненных работ и запчастей</div>
+        {{if .Order.Parts}}
+        <table class="parts-table">
+            <thead>
+                <tr>
+                    <th style="width:10%;">№</th>
+                    <th>Наименование запчасти</th>
+                    <th style="width:20%;">Количество</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range $i, $p := .Order.Parts}}
+                <tr>
+                    <td>{{printf "%d" (inc $i)}}</td>
+                    <td>{{$p.PartName}}</td>
+                    <td>{{$p.Quantity}} шт.</td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+        {{else}}
+        <div class="parts-empty">Запчасти не использовались</div>
+        {{end}}
+    </div>
+
+    <div class="section">
+        <div class="section-title">Описание выполненных работ</div>
+        <table class="data-table">
+            <tr>
+                <td class="value">{{if .Order.Description}}{{.Order.Description}}{{else}}Ремонт устройства выполнен.{{end}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Финансы</div>
+        <table class="data-table">
+            <tr>
+                <td class="label">Итоговая стоимость ремонта</td>
+                <td class="value" style="font-size:14px;font-weight:700;">{{printf "%.0f" .Order.EstimatedCost}} ₸</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="warranty-block">
+        <div class="warranty-title">Гарантийные обязательства</div>
+        <div class="warranty-period">Срок гарантии: 30 (тридцать) календарных дней</div>
+        <p>Гарантия распространяется на выполненные работы и установленные запчасти с даты выдачи устройства клиенту.</p>
+        <p style="margin-top:8px;font-weight:600;color:#333;">Гарантия аннулируется в случае:</p>
+        <ul>
+            <li>Механических повреждений устройства (удары, падения, деформации корпуса).</li>
+            <li>Попадания влаги или жидкости внутрь устройства.</li>
+            <li>Нарушения условий эксплуатации, установленных производителем устройства.</li>
+            <li>Вмешательства третьих лиц в ремонт или модификации устройства после выдачи.</li>
+            <li>Использования неоригинальных аксессуаров и зарядных устройств, повлёкших выход из строя.</li>
+        </ul>
+    </div>
+
+    <div class="signatures">
+        <div class="sig-block">
+            <div class="sig-label">Сотрудник (выдал)</div>
+            <div class="sig-role">Сервисный центр «Xmobile»</div>
+            <div class="sig-line">
+                <span>подпись</span>
+                <span>расшифровка</span>
+            </div>
+        </div>
+        <div class="sig-block">
+            <div class="sig-label">Клиент (получил)</div>
+            <div class="sig-role">{{.Order.ClientName}}</div>
+            <div class="sig-line">
+                <span>подпись</span>
+                <span>расшифровка</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="print-controls">
+    <button class="btn-print" onclick="window.print()">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm0-16h6a2 2 0 012 2v2H7V5a2 2 0 012-2z"/></svg>
+        Распечатать гарантийный талон
+    </button>
+</div>
+
+</body>
+</html>

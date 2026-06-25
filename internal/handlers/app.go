@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"mobile-service/internal/models"
@@ -49,6 +50,15 @@ func (app *App) loadTemplates() {
 			}
 			return s[i:j]
 		},
+		"formatDate": func(t time.Time) string {
+			return t.Format("02.01.2006 15:04")
+		},
+		"formatDateShort": func(t time.Time) string {
+			return t.Format("02.01.2006")
+		},
+		"inc": func(i int) int {
+			return i + 1
+		},
 	}
 
 	pages := []string{
@@ -83,6 +93,19 @@ func (app *App) loadTemplates() {
 		t, err := template.New("").Funcs(funcMap).ParseFiles(publicBase, filepath.Join(root, page))
 		if err != nil {
 			log.Fatalf("parse template %s: %v", page, err)
+		}
+		app.tmpls[page] = t
+	}
+
+	// Standalone print templates (no base layout)
+	printPages := []string{
+		"receipt.html",
+		"warranty.html",
+	}
+	for _, page := range printPages {
+		t, err := template.New(page).Funcs(funcMap).ParseFiles(filepath.Join(root, page))
+		if err != nil {
+			log.Fatalf("parse print template %s: %v", page, err)
 		}
 		app.tmpls[page] = t
 	}
@@ -123,4 +146,17 @@ func (app *App) render(w http.ResponseWriter, r *http.Request, name string, data
 
 func (app *App) flash(r *http.Request, msg string) {
 	app.Sessions.Put(r.Context(), "flash", msg)
+}
+
+// renderPrintable renders a standalone print template without the admin layout.
+func (app *App) renderPrintable(w http.ResponseWriter, name string, data any) {
+	t, ok := app.tmpls[name]
+	if !ok {
+		http.Error(w, fmt.Sprintf("шаблон %s не найден", name), http.StatusInternalServerError)
+		return
+	}
+	if err := t.Execute(w, data); err != nil {
+		log.Printf("render printable %s: %v", name, err)
+		http.Error(w, "Ошибка рендеринга документа", http.StatusInternalServerError)
+	}
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"mobile-service/internal/models"
@@ -206,4 +207,54 @@ app.flash(r, "Заказ отклонён и клиенту отправлено
 }
 
 http.Redirect(w, r, "/orders/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
+}
+
+// printDocData holds data passed to standalone print templates.
+type printDocData struct {
+	Order *models.Order
+	Now   time.Time
+}
+
+func (app *App) OrderReceipt(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	order, err := app.Orders.GetByID(id)
+	if err != nil || order == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	app.renderPrintable(w, "receipt.html", printDocData{
+		Order: order,
+		Now:   time.Now(),
+	})
+}
+
+func (app *App) OrderWarranty(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(chi.URLParam(r, "id"), 10, 64)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	order, err := app.Orders.GetByID(id)
+	if err != nil || order == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	// Warranty is only available for completed orders
+	if order.Status != models.StatusReady && order.Status != models.StatusIssued {
+		http.Error(w, "Гарантийный талон доступен только для завершённых заказов", http.StatusForbidden)
+		return
+	}
+
+	app.renderPrintable(w, "warranty.html", printDocData{
+		Order: order,
+		Now:   time.Now(),
+	})
 }
