@@ -1,4 +1,4 @@
-/* RepairCRM — app.js */
+/* mobile-service — app.js */
 
 document.addEventListener('DOMContentLoaded', () => {
 
