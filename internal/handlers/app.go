@@ -18,19 +18,23 @@ import (
 type App struct {
 	DB       *sql.DB
 	Sessions *scs.SessionManager
-	Users    *repository.UserRepo
-	Orders   *repository.OrderRepo
-	Parts    *repository.PartRepo
-	tmpls    map[string]*template.Template
+	Users      *repository.UserRepo
+	Orders     *repository.OrderRepo
+	Parts      *repository.PartRepo
+	Categories *repository.CategoryRepo
+	Models     *repository.DeviceModelRepo
+	tmpls      map[string]*template.Template
 }
 
 func NewApp(db *sql.DB, sm *scs.SessionManager) *App {
 	app := &App{
 		DB:       db,
 		Sessions: sm,
-		Users:    repository.NewUserRepo(db),
-		Orders:   repository.NewOrderRepo(db),
-		Parts:    repository.NewPartRepo(db),
+		Users:      repository.NewUserRepo(db),
+		Orders:     repository.NewOrderRepo(db),
+		Parts:      repository.NewPartRepo(db),
+		Categories: repository.NewCategoryRepo(db),
+		Models:     repository.NewDeviceModelRepo(db),
 	}
 	app.loadTemplates()
 	return app
@@ -69,6 +73,8 @@ func (app *App) loadTemplates() {
 		"parts.html",
 		"part_new.html",
 		"part_edit.html",
+		"categories.html",
+		"models.html",
 	}
 
 	app.tmpls = make(map[string]*template.Template)

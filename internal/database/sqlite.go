@@ -58,6 +58,18 @@ func migrate(db *sql.DB) error {
 		updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 
+	CREATE TABLE IF NOT EXISTS categories (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL UNIQUE,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE IF NOT EXISTS device_models (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL UNIQUE,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
 	CREATE TABLE IF NOT EXISTS parts (
 		id            INTEGER PRIMARY KEY AUTOINCREMENT,
 		name          TEXT    NOT NULL,
@@ -65,6 +77,10 @@ func migrate(db *sql.DB) error {
 		purchase_price REAL   NOT NULL DEFAULT 0,
 		created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
+
+	-- ALTER TABLE statements can fail if columns already exist, so we use a safe approach in Go code if needed, but since we are executing a block of raw SQL, we can just run ALTER directly.
+	-- Wait, raw sqlite driver might throw errors if we just put ALTER TABLE here. Instead of failing the migration if the column exists, it's better to add them here and we'll ignore the error in Go code if they exist.
+	-- Alternatively, since we don't have PRAGMA table_info checks in raw SQL string, we'll run them separately in migrate().
 
 	CREATE TABLE IF NOT EXISTS order_parts (
 		id        INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,10 +97,29 @@ func migrate(db *sql.DB) error {
 	);
 
 	CREATE INDEX IF NOT EXISTS sessions_expiry_idx ON sessions(expiry);
+	CREATE TABLE IF NOT EXISTS part_models (
+		part_id INTEGER NOT NULL REFERENCES parts(id) ON DELETE CASCADE,
+		model_id INTEGER NOT NULL REFERENCES device_models(id) ON DELETE CASCADE,
+		PRIMARY KEY(part_id, model_id)
+	);
 	`
 
 	_, err := db.Exec(schema)
-	return err
+	if err != nil {
+		return err
+	}
+
+	// ALTER parts table to add new columns. Ignore errors if columns already exist.
+	alterQueries := []string{
+		"ALTER TABLE parts ADD COLUMN category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL;",
+		"ALTER TABLE parts ADD COLUMN sku TEXT DEFAULT '';",
+		"ALTER TABLE parts ADD COLUMN sell_price REAL NOT NULL DEFAULT 0;",
+	}
+	for _, q := range alterQueries {
+		_, _ = db.Exec(q)
+	}
+
+	return nil
 }
 
 func seed(db *sql.DB) error {

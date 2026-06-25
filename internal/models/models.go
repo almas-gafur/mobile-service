@@ -71,12 +71,31 @@ type Order struct {
 	Parts         []OrderPart
 }
 
+type Category struct {
+	ID        int64
+	Name      string
+	CreatedAt time.Time
+}
+
+type DeviceModel struct {
+	ID        int64
+	Name      string
+	CreatedAt time.Time
+}
+
 type Part struct {
 	ID            int64
+	CategoryID    *int64 // nullable for parts without a category
+	CategoryName  string // for display
+	SKU           string
 	Name          string
 	Quantity      int
 	PurchasePrice float64
+	SellPrice     float64
 	CreatedAt     time.Time
+
+	// Relations
+	Models []DeviceModel
 }
 
 type OrderPart struct {

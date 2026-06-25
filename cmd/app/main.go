@@ -79,6 +79,15 @@ func main() {
 		r.Post("/parts/new", app.PartCreate)
 		r.Get("/parts/{id}/edit", app.PartEditPage)
 		r.Post("/parts/{id}/edit", app.PartUpdate)
+		r.Post("/parts/{id}/delete", app.PartDelete)
+
+		r.Get("/categories", app.CategoriesList)
+		r.Post("/categories/new", app.CategoryCreate)
+		r.Post("/categories/{id}/delete", app.CategoryDelete)
+
+		r.Get("/models", app.DeviceModelsList)
+		r.Post("/models/new", app.DeviceModelCreate)
+		r.Post("/models/{id}/delete", app.DeviceModelDelete)
 	})
 
 	log.Printf("Сервер запущен на http://0.0.0.0:%s", cfg.Port)
